@@ -2,7 +2,7 @@
   "name": "user-management-backend",
   "version": "1.0.0",
   "scripts": {
-    "dev": "tsc-watch --onSuccess \"node .\""
+    "dev": "tsc-watch --onSuccess \"node dist/index.js\""
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
