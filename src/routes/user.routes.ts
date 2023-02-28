@@ -4,6 +4,7 @@ import { hashPassword } from '../utils/password';
 import mw from '../middlewares/base.middleware';
 import UserModel from '../db/models/user.model';
 import { Express } from 'express';
+import { omit } from 'lodash';
 import { Knex } from 'knex';
 import {
   firstNameValidator,
@@ -14,6 +15,11 @@ import {
 } from '../utils/validators';
 
 export default function UserRoutes(app: Express, db: Knex) {
+  /**
+   * Creates a new user.
+   *
+   * @returns created user without passwordHash and passwordSalt.
+   */
   app.post(
     '/users/create',
     validate({
@@ -50,4 +56,17 @@ export default function UserRoutes(app: Express, db: Knex) {
       });
     })
   );
+
+  /**
+   * Gets all users.
+   *
+   * @returns all users without passwordHash and passwordSalt.
+   */
+  app.get('/users', async (_, res) => {
+    const users = await UserModel.query().withGraphFetched('pets');
+
+    res.send({
+      result: users.map((user) => omit(user, ['passwordHash', 'passwordSalt'])),
+    });
+  });
 }
