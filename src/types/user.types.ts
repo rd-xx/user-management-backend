@@ -6,6 +6,11 @@ export type CreateUserType = {
   birthDate: string;
 };
 
+export type LoginUserType = {
+  email: string;
+  password: string;
+};
+
 export type GetUserType = {
   userId: number;
 };

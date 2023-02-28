@@ -1,6 +1,6 @@
 export const security = {
   jwt: {
-    secret: process.env.JWT_SECRET,
+    secret: process.env.JWT_SECRET!,
     expiresIn: '1 day',
   },
   password: {
