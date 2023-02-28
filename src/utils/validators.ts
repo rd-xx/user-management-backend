@@ -23,3 +23,5 @@ export const birthDateValidator = yup
   .date()
   .max(new Date(), 'Birth date must be in the past')
   .label('Birth date');
+
+export const idValidator = yup.number().min(1).label('ID');

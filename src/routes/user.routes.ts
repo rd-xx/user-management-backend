@@ -1,5 +1,5 @@
+import { CreateUserType, GetUserType } from '../types/user.types';
 import validate from '../middlewares/validation.middleware';
-import { UserCreateType } from '../types/user.types';
 import { hashPassword } from '../utils/password';
 import mw from '../middlewares/base.middleware';
 import UserModel from '../db/models/user.model';
@@ -12,6 +12,7 @@ import {
   lastNameValidator,
   passwordValidator,
   emailValidator,
+  idValidator,
 } from '../utils/validators';
 
 export default function UserRoutes(app: Express, db: Knex) {
@@ -33,7 +34,7 @@ export default function UserRoutes(app: Express, db: Knex) {
     }),
     mw(async (req, res) => {
       const { firstName, lastName, email, password, birthDate } = req.data
-        .body as UserCreateType;
+        .body as CreateUserType;
       const [passwordHash, passwordSalt] = hashPassword(password);
       const [user] = await db('users')
         .insert({
@@ -64,4 +65,25 @@ export default function UserRoutes(app: Express, db: Knex) {
       result: users.map((user) => omit(user, ['passwordHash', 'passwordSalt'])),
     });
   });
+
+  /**
+   * Gets a specific user.
+   *
+   * @returns user without passwordHash and passwordSalt.
+   */
+  app.get(
+    '/users/:userId',
+    validate({ params: { userId: idValidator.required() } }),
+    async (req, res) => {
+      const { userId } = req.data.params as GetUserType;
+      const user = await UserModel.query()
+        .findById(userId)
+        .withGraphFetched('pets');
+
+      // Will send {} if user is not found
+      res.send({
+        result: omit(user, ['passwordHash', 'passwordSalt']),
+      });
+    }
+  );
 }
