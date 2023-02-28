@@ -47,12 +47,7 @@ export default function UserRoutes(app: Express, db: Knex) {
         .returning('*');
 
       res.send({
-        result: {
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-        },
+        result: omit(user, ['passwordHash', 'passwordSalt']),
       });
     })
   );
