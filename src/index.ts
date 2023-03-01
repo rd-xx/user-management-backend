@@ -5,6 +5,7 @@ import UserRoutes from './routes/user.routes';
 // @ts-expect-error no typings
 import config from '../knexfile.js';
 import express from 'express';
+import cors from 'cors';
 import knex from 'knex';
 
 async function main() {
@@ -12,6 +13,7 @@ async function main() {
 
   // Middlewares
   app.use(express.json());
+  app.use(cors());
 
   // Database
   const knexInstance = knex(config);
