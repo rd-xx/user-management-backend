@@ -15,6 +15,6 @@ export function hashPassword(
       passwordSecurity.keylen,
       passwordSecurity.digest
     ).toString('hex'),
-    salt,
+    salt
   ];
 }

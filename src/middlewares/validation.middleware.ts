@@ -14,16 +14,16 @@ export const validate = (
         .shape({
           ...(body ? { body: yup.object().shape(body) } : {}),
           ...(query ? { query: yup.object().shape(query) } : {}),
-          ...(params ? { params: yup.object().shape(params) } : {}),
+          ...(params ? { params: yup.object().shape(params) } : {})
         })
         .validate(
           {
             params: req.params,
             body: req.body,
-            query: req.query,
+            query: req.query
           },
           {
-            abortEarly: false,
+            abortEarly: false
           }
         );
 

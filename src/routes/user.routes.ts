@@ -15,12 +15,12 @@ import {
   lastNameValidator,
   passwordValidator,
   emailValidator,
-  idValidator,
+  idValidator
 } from '../utils/validators';
 import {
   CreateUserType,
   LoginUserType,
-  GetUserType,
+  GetUserType
 } from '../types/user.types';
 
 export default function UserRoutes(app: Express, db: Knex) {
@@ -37,26 +37,26 @@ export default function UserRoutes(app: Express, db: Knex) {
         lastName: lastNameValidator.required(),
         email: emailValidator.required(),
         password: passwordValidator.required(),
-        birthDate: birthDateValidator.required(),
-      },
+        birthDate: birthDateValidator.required()
+      }
     }),
     mw(async (req, res) => {
       const { firstName, lastName, email, password, birthDate } = req.data
-        .body as CreateUserType;
-      const [passwordHash, passwordSalt] = hashPassword(password);
-      const [user] = await db('users')
-        .insert({
-          firstName,
-          lastName,
-          email,
-          passwordHash,
-          passwordSalt,
-          birthDate,
-        })
-        .returning('*');
+          .body as CreateUserType,
+        [passwordHash, passwordSalt] = hashPassword(password),
+        [user] = await db('users')
+          .insert({
+            firstName,
+            lastName,
+            email,
+            passwordHash,
+            passwordSalt,
+            birthDate
+          })
+          .returning('*');
 
       res.send({
-        result: omit(user, ['passwordHash', 'passwordSalt']),
+        result: omit(user, ['passwordHash', 'passwordSalt'])
       });
     })
   );
@@ -71,13 +71,12 @@ export default function UserRoutes(app: Express, db: Knex) {
     validate({
       body: {
         email: emailValidator.required(),
-        password: passwordValidator.required(),
-      },
+        password: passwordValidator.required()
+      }
     }),
     mw(async (req, res) => {
-      const { email, password } = req.data.body as LoginUserType;
-
-      const [user] = await db('users').where({ email });
+      const { email, password } = req.data.body as LoginUserType,
+        [user] = await db('users').where({ email });
       if (!user) throw new InvalidCredentialsError();
 
       const [passwordHash] = hashPassword(password, user.passwordSalt);
@@ -89,9 +88,9 @@ export default function UserRoutes(app: Express, db: Knex) {
           payload: {
             user: {
               id: user.id,
-              fullName: `${user.firstName} ${user.lastName}`,
-            },
-          },
+              fullName: `${user.firstName} ${user.lastName}`
+            }
+          }
         },
         security.jwt.secret,
         { expiresIn: security.jwt.expiresIn }
@@ -110,7 +109,7 @@ export default function UserRoutes(app: Express, db: Knex) {
     const users = await UserModel.query().withGraphFetched('pets');
 
     res.send({
-      result: users.map((user) => omit(user, ['passwordHash', 'passwordSalt'])),
+      result: users.map((user) => omit(user, ['passwordHash', 'passwordSalt']))
     });
   });
 
@@ -124,14 +123,14 @@ export default function UserRoutes(app: Express, db: Knex) {
     AuthMiddleware,
     validate({ params: { userId: idValidator.required() } }),
     async (req, res) => {
-      const { userId } = req.data.params as GetUserType;
-      const user = await UserModel.query()
-        .findById(userId)
-        .withGraphFetched('pets');
+      const { userId } = req.data.params as GetUserType,
+        user = await UserModel.query()
+          .findById(userId)
+          .withGraphFetched('pets');
 
       // Will send {} if user is not found
       res.send({
-        result: omit(user, ['passwordHash', 'passwordSalt']),
+        result: omit(user, ['passwordHash', 'passwordSalt'])
       });
     }
   );
